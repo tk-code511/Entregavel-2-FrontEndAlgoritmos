@@ -177,15 +177,22 @@
         </nav>
 
         <main>
-            <!-- Contagem -->
+            <!-- Contagem (CORRIGIDO) -->
             <div id="contagem" class="algo-panel active">
                 <h2>Contagem</h2>
-                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Conta quantos valores inteiros existem em uma lista.</p>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Analisa uma sequência de números e conta quais deles estão no intervalo entre o menor valor digitado e o número limite que você escolher.</p>
+                
                 <div class="form-group">
-                    <label>Valores (separados por vírgula):</label>
-                    <input type="text" id="contagem-input" placeholder="Ex: 10, 20.5, 30, 42.8, 50">
+                    <label>Número Limite (Teto):</label>
+                    <input type="number" id="contagem-limite" placeholder="Ex: 50">
                 </div>
-                <button class="action-btn" onclick="calcContagem()">Calcular Contagem</button>
+                
+                <div class="form-group">
+                    <label>Valores a serem avaliados (separados por vírgula):</label>
+                    <input type="text" id="contagem-input" placeholder="Ex: 10, 25, 60, 5, 80, 42">
+                </div>
+                
+                <button class="action-btn" onclick="calcContagem()">Contar e Filtrar</button>
                 <div id="contagem-result" class="result-box">Aguardando dados...</div>
             </div>
 
@@ -204,7 +211,7 @@
             <!-- Fatorial -->
             <div id="fatorial" class="algo-panel">
                 <h2>Fatorial</h2>
-                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Calcula o fatorial de um número inteiro positivo ($N!$).</p>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Calcula o fatorial de um número inteiro positivo (N!).</p>
                 <div class="form-group">
                     <label>Número N:</label>
                     <input type="number" id="fatorial-input" min="0" placeholder="Ex: 5">
@@ -216,7 +223,7 @@
             <!-- Fibonacci -->
             <div id="fibonacci" class="algo-panel">
                 <h2>Fibonacci</h2>
-                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Gera os $N$ primeiros termos da sequência de Fibonacci.</p>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Gera os N primeiros termos da sequência de Fibonacci.</p>
                 <div class="form-group">
                     <label>Quantidade de termos (N):</label>
                     <input type="number" id="fibonacci-input" min="1" placeholder="Ex: 8">
@@ -276,19 +283,33 @@
             btn.classList.add('active');
         }
 
-        // 1. Contagem
+        // 1. Contagem (CORRIGIDO)
         function calcContagem() {
+            const limite = parseFloat(document.getElementById('contagem-limite').value);
             const raw = document.getElementById('contagem-input').value;
-            const nums = raw.split(',').map(n => n.trim()).filter(n => n !== '');
-            if (!nums.length) return alert('Insira valores válidos.');
+            
+            if (isNaN(limite)) {
+                return alert('Por favor, digite um número limite válido.');
+            }
 
-            let count = 0;
-            nums.forEach(n => {
-                const val = Number(n);
-                if (!isNaN(val) && Number.isInteger(val)) count++;
-            });
+            const nums = raw.split(',').map(n => parseFloat(n.trim())).filter(n => !isNaN(n));
+            
+            if (!nums.length) {
+                return alert('Por favor, insira valores numéricos válidos na lista.');
+            }
 
-            document.getElementById('contagem-result').innerText = `Total de itens: ${nums.length}\nQuantidade de inteiros: ${count}`;
+            // Descobre qual é o menor número da lista digitada
+            const menor = Math.min(...nums);
+            
+            // Filtra os números que estão entre o menor valor e o limite
+            const validados = nums.filter(n => n >= menor && n <= limite);
+
+            document.getElementById('contagem-result').innerText = 
+                `Menor valor digitado: ${menor}\n` +
+                `Limite estabelecido: ${limite}\n` +
+                `--------------------------\n` +
+                `Números que se encaixam: [${validados.join(', ')}]\n` +
+                `Contagem total: ${validados.length} número(s)`;
         }
 
         // 2. Soma
